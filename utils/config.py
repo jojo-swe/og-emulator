@@ -3,6 +3,7 @@
 
 import argparse
 import asyncio
+import configparser
 import json
 import logging
 import os
@@ -105,20 +106,52 @@ class ConfigLoader:
             ]
         }
     
-    def load(self) -> None:
+    def load(self, config_path: Optional[str] = None) -> None:
         """Load configuration from file."""
+        path = Path(config_path) if config_path else self.config_path
+        if not path:
+            return
+
         try:
-            with open(self.config_path, 'r', encoding='utf-8') as f:
-                file_config = json.load(f)
-                # Deep merge with defaults
-                self._deep_merge(self._config, file_config)
-            logging.info(f"Loaded configuration from {self.config_path}")
-        except json.JSONDecodeError as e:
-            logging.error(f"Invalid JSON in configuration file: {e}")
-            raise
+            with open(path, 'r', encoding='utf-8') as f:
+                raw = f.read()
+
+            file_config: Dict[str, Any]
+            try:
+                file_config = json.loads(raw)
+            except json.JSONDecodeError:
+                parser = configparser.ConfigParser()
+                parser.read_string(raw)
+                file_config = {section: dict(parser.items(section)) for section in parser.sections()}
+
+                server_section = file_config.get("server")
+                if isinstance(server_section, dict):
+                    for int_key in ("port", "max_sessions"):
+                        if int_key in server_section:
+                            try:
+                                server_section[int_key] = int(server_section[int_key])
+                            except (TypeError, ValueError):
+                                pass
+
+            # Deep merge with defaults
+            self._deep_merge(self._config, file_config)
+            logging.info(f"Loaded configuration from {path}")
         except Exception as e:
             logging.error(f"Error loading configuration: {e}")
             raise
+
+    def set(self, *args: Any) -> None:
+        """Set a configuration value using nested keys."""
+        if len(args) < 2:
+            raise ValueError("set() requires at least one key and a value")
+
+        *keys, value = args
+        node: Any = self._config
+        for key in keys[:-1]:
+            if key not in node or not isinstance(node[key], dict):
+                node[key] = {}
+            node = node[key]
+        node[keys[-1]] = value
     
     def _deep_merge(self, base: dict, update: dict) -> None:
         """Deep merge update dict into base dict."""
@@ -149,14 +182,21 @@ class ConfigLoader:
     def get_server_config(self) -> Dict[str, Any]:
         """Get server configuration formatted for create_ssh_server."""
         server_config = self.get('server', default={})
+
+        def _as_int(val: Any, default: int) -> int:
+            try:
+                return int(val)
+            except (TypeError, ValueError):
+                return default
+
         return {
             'host': server_config.get('host', '0.0.0.0'),
-            'port': server_config.get('port', 2222),
+            'port': _as_int(server_config.get('port', 2222), 2222),
             'username': server_config.get('username', 'admin'),
             'password': server_config.get('password', 'admin'),
             'host_key': server_config.get('host_key', 'ssh_host_key'),
             'banner': server_config.get('banner', ''),
-            'max_sessions': server_config.get('max_sessions', 10)
+            'max_sessions': _as_int(server_config.get('max_sessions', 10), 10)
         }
     
     def get_devices(self) -> List[Dict[str, Any]]:
