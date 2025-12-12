@@ -1,0 +1,43 @@
+{
+  "host": "0.0.0.0",
+  "port": 2222,
+  "username": "admin",
+  "password": "admin",
+  "host_key": "ssh_host_key",
+  "logging": {
+    "level": "INFO",
+    "file": "logs/emulator.log"
+  },
+  "devices": [
+    {
+      "port": 1,
+      "device_type": "opengear",
+      "model": "ACM7000",
+      "hostname": "opengear-1"
+    },
+    {
+      "port": 2,
+      "device_type": "cisco",
+      "model": "C9300",
+      "hostname": "cisco-switch-1"
+    },
+    {
+      "port": 3,
+      "device_type": "garderos",
+      "model": "GCX-3100",
+      "hostname": "garderos-1"
+    },
+    {
+      "port": 4,
+      "device_type": "cisco",
+      "model": "C2960",
+      "hostname": "cisco-switch-2"
+    },
+    {
+      "port": 5,
+      "device_type": "opengear",
+      "model": "IM7200",
+      "hostname": "opengear-2"
+    }
+  ]
+}

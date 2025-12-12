@@ -1,0 +1,11 @@
+-r requirements.txt
+
+pytest>=7.4.0
+pytest-asyncio>=0.21.1
+pytest-cov>=4.1.0
+black>=21.0
+isort>=5.0
+mypy>=0.900
+flake8>=3.9.0
+sphinx>=4.0.0
+sphinx-rtd-theme>=0.5.0

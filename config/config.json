@@ -1,0 +1,84 @@
+{
+  "server": {
+    "host": "0.0.0.0",
+    "port": 2222,
+    "username": "admin",
+    "password": "admin123",
+    "host_key": "ssh_host_key",
+    "banner": "Welcome to SSH Device Emulator\r\n==================================\r\n",
+    "max_sessions": 10
+  },
+  "logging": {
+    "level": "INFO",
+    "file": "logs/emulator.log"
+  },
+  "devices": [
+    {
+      "port": 1,
+      "device_type": "opengear",
+      "model": "ACM7000",
+      "hostname": "og-console-01",
+      "firmware_version": "4.5.2",
+      "build_number": "45289",
+      "username": "root",
+      "password": "default"
+    },
+    {
+      "port": 2,
+      "device_type": "cisco",
+      "model": "C9300-48P",
+      "hostname": "core-sw-01",
+      "firmware_version": "17.6.3",
+      "build_number": "12345",
+      "username": "cisco",
+      "password": "cisco123",
+      "enable_password": "enable123"
+    },
+    {
+      "port": 3,
+      "device_type": "garderos",
+      "model": "GCX-3200",
+      "hostname": "gard-edge-01",
+      "firmware_version": "3.8.1",
+      "build_number": "38156"
+    },
+    {
+      "port": 4,
+      "device_type": "cisco",
+      "model": "C2960X-24PS-L",
+      "hostname": "access-sw-01",
+      "firmware_version": "15.2(7)E3"
+    },
+    {
+      "port": 5,
+      "device_type": "opengear",
+      "model": "IM7200-2-DAC",
+      "hostname": "og-remote-01",
+      "firmware_version": "4.6.0",
+      "build_number": "46012"
+    },
+    {
+      "port": 6,
+      "device_type": "garderos",
+      "model": "GCX-1100",
+      "hostname": "gard-branch-01",
+      "firmware_version": "3.5.4",
+      "build_number": "35467"
+    },
+    {
+      "port": 7,
+      "device_type": "cisco",
+      "model": "C3850-48P",
+      "hostname": "dist-sw-01",
+      "firmware_version": "16.12.5"
+    },
+    {
+      "port": 8,
+      "device_type": "opengear",
+      "model": "CM7100",
+      "hostname": "og-datacenter-01",
+      "firmware_version": "4.4.1",
+      "build_number": "44156"
+    }
+  ]
+}

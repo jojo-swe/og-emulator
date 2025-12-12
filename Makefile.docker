@@ -1,0 +1,85 @@
+.PHONY: help setup install run test clean docker-build docker-run docker-stop
+
+# Default target
+help:
+	@echo "SSH Device Emulator - Available targets:"
+	@echo "  make setup       - Run initial setup"
+	@echo "  make install     - Install dependencies"
+	@echo "  make run         - Run the emulator"
+	@echo "  make test        - Run tests"
+	@echo "  make clean       - Clean up generated files"
+	@echo "  make docker-build - Build Docker image"
+	@echo "  make docker-run  - Run in Docker"
+	@echo "  make docker-stop - Stop Docker container"
+
+# Setup environment
+setup:
+	@echo "Running setup..."
+	@python setup.py
+
+# Install dependencies
+install:
+	@echo "Installing dependencies..."
+	@pip install -r requirements.txt
+
+# Run the emulator
+run:
+	@echo "Starting SSH emulator..."
+	@python main.py
+
+# Run with debug
+debug:
+	@echo "Starting SSH emulator in debug mode..."
+	@python main.py --debug
+
+# Run tests
+test:
+	@echo "Running configuration tests..."
+	@python test_config.py
+
+# Test SSH connection
+test-ssh:
+	@echo "Testing SSH connection..."
+	@sshpass -p admin ssh -o StrictHostKeyChecking=no admin@localhost -p 2222 'echo "Connection successful"'
+
+# Clean up
+clean:
+	@echo "Cleaning up..."
+	@rm -f ssh_host_key
+	@rm -f *.log
+	@rm -rf logs/
+	@rm -rf __pycache__/
+	@rm -f test_config.json
+
+# Docker operations
+docker-build:
+	@echo "Building Docker image..."
+	@docker build -t ssh-emulator:latest .
+
+docker-run:
+	@echo "Running in Docker..."
+	@docker-compose up -d
+
+docker-stop:
+	@echo "Stopping Docker container..."
+	@docker-compose down
+
+docker-logs:
+	@docker-compose logs -f ssh-emulator
+
+# Development helpers
+format:
+	@echo "Formatting code..."
+	@python -m black *.py
+
+lint:
+	@echo "Linting code..."
+	@python -m pylint *.py
+
+# Create sample configs
+sample-configs:
+	@echo "Creating sample configurations..."
+	@mkdir -p configs
+	@echo '{"server": {"port": 2223}, "devices": [{"port": 1, "device_type": "cisco", "model": "C9300", "hostname": "switch1"}]}' > configs/minimal.json
+	@echo '{"server": {"port": 2224, "username": "root", "password": "toor"}, "devices": []}' > configs/auth-only.json
+	@echo "Sample configs created in configs/"

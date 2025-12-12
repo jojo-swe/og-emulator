@@ -1,0 +1,103 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Virtual Environment
+venv/
+env/
+ENV/
+.env
+.venv/
+.python-version
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Logs and databases
+*.log
+*.sql
+*.sqlite
+
+# Local configuration
+config/local_*.ini
+config/*.key
+config/private/
+
+# Test and coverage
+.coverage
+htmlcov/
+.pytest_cache/
+.mypy_cache/
+.coverage.*
+
+# Project specific
+ssh_host_key
+!ssh_host_key.example
+
+# Docker
+Dockerfile
+compose.yaml
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# SSH keys
+ssh_host_key
+*.pem
+*.p12
+*.key
+
+# Local development
+.venv/
+.env
+
+# Project specific
+*.pem
+*.key
+*.crt
+*.p12
+*.p7b
+*.pfx
+*.cer
+
+# Logs
+logs/
+old_files/
+*.log
