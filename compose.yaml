@@ -1,0 +1,20 @@
+services:
+  opengear-emulator:
+    build:
+      context: .
+    container_name: opengear-emulator
+    restart: unless-stopped
+    ports:
+      - "2222:2222"
+    volumes:
+      - ./config:/app/config:ro
+    healthcheck:
+      test:
+        - CMD
+        - python
+        - -c
+        - "import socket; s=socket.create_connection(('127.0.0.1', 2222), 2); s.close()"
+      interval: 10s
+      timeout: 3s
+      retries: 3
+      start_period: 10s
