@@ -4,7 +4,7 @@ This directory contains example scripts that demonstrate how to use the SSH emul
 
 ## Available Examples
 
-- `paramiko_example.py`: Demonstrates how to connect to the emulator using the Paramiko SSH client.
+- `asyncssh_example.py`: Connects to the emulator with `asyncssh`, drives pmshell, runs concurrent sessions, and prints Paramiko, Netmiko and Ansible snippets.
 
 ## Running Examples
 
@@ -15,5 +15,5 @@ This directory contains example scripts that demonstrate how to use the SSH emul
 
 2. Run the example script in another terminal:
    ```bash
-   python examples/paramiko_example.py
+   python examples/asyncssh_example.py
    ```

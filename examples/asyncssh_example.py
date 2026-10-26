@@ -111,7 +111,7 @@ def create_custom_config(filename='custom_config.json'):
         json.dump(config, f, indent=2)
     
     print(f"✓ Created {filename}")
-    print(f"  Run with: python main.py --config {filename}")
+    print(f"  Run with: python -m emulator --config {filename}")
     return filename
 
 
@@ -202,7 +202,7 @@ async def main():
     
     # Note: Make sure the emulator is running before executing these tests
     print("\nNOTE: Make sure the SSH emulator is running on port 2222")
-    print("      Run 'python main.py' in another terminal\n")
+    print("      Run 'python -m emulator' in another terminal\n")
     
     try:
         # Test basic connection
@@ -223,7 +223,7 @@ async def main():
     except Exception as e:
         print(f"\nError: {e}")
         print("\nMake sure the SSH emulator is running:")
-        print("  python main.py")
+        print("  python -m emulator")
 
 
 if __name__ == '__main__':
