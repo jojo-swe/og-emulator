@@ -56,10 +56,6 @@ htmlcov/
 ssh_host_key
 !ssh_host_key.example
 
-# Docker
-Dockerfile
-compose.yaml
-
 # OS generated files
 .DS_Store
 .DS_Store?
