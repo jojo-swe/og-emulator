@@ -14,11 +14,22 @@ An SSH emulator that simulates OpenGear console servers with connected Cisco and
 
 ## Installation
 
+Requires Python 3.11 or newer (the versions tested in CI). The project runs from a source checkout or from Docker; it is not packaged for `pip install .`.
+
 1. Install the required dependencies:
 
 ```bash
 pip install -r requirements.txt
 ```
+
+### Docker Quick Start
+
+```bash
+docker compose up --build -d
+ssh admin@localhost -p 2222
+```
+
+The default password is `admin`. See [docs/DEMO.md](docs/DEMO.md) for a five-minute walkthrough.
 
 ## Usage
 
@@ -30,7 +41,7 @@ Run with default settings (port 2222, username: admin, password: admin):
 python -m emulator
 ```
 
-The CLI automatically loads the defaults defined in `config/default_config.json`. Update that file (or pass `--config`) to customize devices, credentials, logging, or host key paths.
+`python scripts/run-ssh-emulator.py` starts the same CLI. The CLI automatically loads the defaults defined in `config/default_config.json`. Update that file (or pass `--config`) to customize devices, credentials, logging, or host key paths.
 
 ### With Custom Settings
 
@@ -54,78 +65,73 @@ python -m emulator --debug
 
 ## Connecting to the Emulator
 
-1. SSH to the emulator:
-
 ```bash
 ssh admin@localhost -p 2222
 ```
 
-2. Once connected, you'll see the OpenGear prompt:
+A full session against the default configuration: log in, open `pmshell`, connect to port 2, run `show version`, then `exit` twice. Real output; the long `show version` licence text is trimmed. The emulator currently echoes each typed line twice on an interactive terminal, which is why commands appear doubled.
 
 ```
 OpenGear Console Server SSH Emulator
 Type 'pmshell' to connect to a device
+Type 'help' for available commands
 
-root@opengear:~# 
-```
+admin@opengear:~# pmshell
+pmshell
 
-3. Type `pmshell` to see available devices:
+Port Manager
 
-```
-root@opengear:~# pmshell
-
-Connect to port:
-==================================================
-Port    Name                Status
-==================================================
-port01  opengear-1          Available
-port02  cisco-switch-1      Available
-port03  garderos-1          Available
-port04  N/A                 N/A
-port05  N/A                 N/A
-port06  N/A                 N/A
-port07  N/A                 N/A
-port08  N/A                 N/A
-port09  N/A                 N/A
-port10  N/A                 N/A
-port11  N/A                 N/A
-port12  N/A                 N/A
-==================================================
-
-Connect to port > 
-```
-
-4. Select a port number to connect to that device:
-
-```
+1: opengear-1       2: cisco-switch-1   3: garderos-1       4: cisco-switch-2
+5: opengear-2
 Connect to port > 2
+2
 
 Connected to cisco-switch-1 on port 2
+C9300 - cisco-switch-1
 
-Cisco C9300 - cisco-switch-1
-
-cisco-switch-1# 
-```
-
-5. Alternatively, connect directly to a port using the `-l` option:
-
-```
-root@opengear:~# pmshell -l port02
-
-Connected to cisco-switch-1 on port 2
-
-Cisco C9300 - cisco-switch-1
-
-cisco-switch-1# 
-```
-
-6. Use device-specific commands:
-
-```
 cisco-switch-1# show version
-cisco-switch-1# help
-cisco-switch-1# exit
+show version
+
+Cisco IOS Software, C9300 Software (C9300-ADVENTERPRISEK9-M), Version 15.2(4)M6, RELEASE SOFTWARE (fc1)
+Technical Support: http://www.cisco.com/techsupport
+Copyright (c) 1986-2013 by Cisco Systems, Inc.
+Compiled Wed 26-Jun-13 02:20 by prod_rel_team
+
+ROM: System Bootstrap, Version 15.1(4)M6, RELEASE SOFTWARE (fc1)
+
+cisco-switch-1 uptime is 5 weeks, 3 days, 12 hours, 37 minutes
+[... licence text trimmed ...]
+Configuration register is 0x2102
+
+cisco-switch-1# cisco-switch-1# exit
+exit
+
+Disconnected from device.
+admin@opengear:~# exit
+exit
+
+Disconnecting...
 ```
+
+You can also connect directly to a port with `pmshell -l port02`, or log in as `admin:serial` (`ssh admin:serial@localhost -p 2222`) to skip the shell and land straight in the pmshell port listing.
+
+### Non-interactive Use
+
+Test clients usually run single commands without a terminal (SSH exec mode):
+
+```bash
+ssh admin@localhost -p 2222 help
+ssh admin@localhost -p 2222 'show system'
+ssh admin@localhost -p 2222 pmshell
+```
+
+`pmshell` in exec mode reads port numbers and device commands from stdin, so it can be scripted (`printf '3\nshow version\nexit\n' | ssh admin@localhost -p 2222 pmshell`). Exit codes:
+
+| Code | Meaning |
+|------|---------|
+| `0` | Command succeeded |
+| `2` | Unknown `show` subcommand |
+| `127` | Command not found |
 
 ## Available Commands
 
@@ -133,12 +139,14 @@ cisco-switch-1# exit
 
 - `pmshell` - Show port list and enter pmshell mode
 - `pmshell -l portXX` - Connect directly to port XX (e.g., `pmshell -l port02`)
+- `show version` - Show emulator version
+- `show system` - Show console server system information
 - `help` - Show available commands
 - `exit` or `quit` - Disconnect from SSH session
 
 ### pmshell Mode
 
-- `<port>` - Connect to a specific port by number
+- `<port>` - Connect to a specific port by number (valid ports are 1–12)
 - `exit`, `quit`, `.` - Exit pmshell
 
 ### pmshell Special Commands
@@ -156,13 +164,23 @@ The following special commands start with ~ (tilde):
 
 ### Device Mode
 
-- `help` - Show available commands for the device
-- `show version` - Show device version information
-- `show system` - Show system information (Garderos/OpenGear)
-- `show running-config` - Show running configuration (Cisco)
-- `exit` or `quit` - Return to OpenGear mode
+All three device types implement:
 
-## Configuration File Format
+- `show version` - Show device version information
+- `show running-config` - Show running configuration
+- `show interfaces` - Show interface status
+- `enable` / `disable` - Enter or leave privileged mode. On Cisco devices `enable` prompts for a password: it defaults to `cisco` and can be overridden with `enable_password` in the device's JSON entry
+- `configure terminal` - Enter configuration mode (requires `enable`)
+- `end` - Leave configuration mode
+- `exit` or `quit` - Disconnect from the device and return to OpenGear mode
+
+## Configuration
+
+Settings are applied in this order, each layer overriding the previous one:
+
+1. `config/default_config.json` (shipped defaults)
+2. `--config FILE`, merged on top
+3. Command-line flags (`--host`, `--port`, `--username`, `--password`)
 
 Create a JSON file with the following structure:
 
@@ -172,6 +190,11 @@ Create a JSON file with the following structure:
   "port": 2222,
   "username": "admin",
   "password": "admin123",
+  "host_key": "ssh_host_key",
+  "logging": {
+    "level": "INFO",
+    "file": "logs/emulator.log"
+  },
   "devices": [
     {
       "port": 1,
@@ -185,11 +208,19 @@ Create a JSON file with the following structure:
       "port": 2,
       "device_type": "cisco",
       "model": "C9300-48P",
-      "hostname": "cisco-core-sw1"
+      "hostname": "cisco-core-sw1",
+      "enable_password": "enable123"
     }
   ]
 }
 ```
+
+- `host_key`: path to the SSH host key. It is generated on first start if missing; keep it out of git.
+- `logging.level`: standard level name (`DEBUG`, `INFO`, ...). `--debug` overrides it.
+- `logging.file`: optional log file path; its directory is created if needed.
+- `devices[].port`: pmshell port, 1–12.
+
+The nested form used by `config/config.json`, with server settings under a `"server": {...}` key, is also accepted. Its `banner` and `max_sessions` keys are ignored by the CLI.
 
 ## Architecture
 
@@ -198,6 +229,18 @@ Create a JSON file with the following structure:
 - **State Machine**: Clear state transitions between OpenGear shell, pmshell, and device modes
 - **Configurable Devices**: JSON configuration for easy device setup
 
+## Running the Tests
+
+```bash
+pip install -r requirements-dev.txt
+pytest
+ruff check .
+```
+
+## Examples
+
+See [examples/README.md](examples/README.md) for a scripted client built on `asyncssh`.
+
 ## Troubleshooting
 
 ### Port Already in Use
@@ -205,7 +248,7 @@ Create a JSON file with the following structure:
 If you see "Port 2222 is already in use", either:
 
 - Stop the other process using that port
-- Use a different port: `python run_ssh_emulator.py --port 2223`
+- Use a different port: `python -m emulator --port 2223`
 
 ### Authentication Failed
 
@@ -217,13 +260,13 @@ If you see "Port 2222 is already in use", either:
 
 - Make sure you're using the `pmshell` command first
 - Enter a valid port number from the list
-- Type 'q' to cancel port selection
+- Type `exit` to leave port selection
 
 ## Development Notes
 
 The main components are:
 
-- `Device`: Simple device representation with command handlers
+- `BaseDevice` (`devices/base.py`): Base class for emulated devices; concrete devices are created through `DeviceFactory` (`devices/factory.py`)
 - `DeviceManager`: Manages all devices and active connections
 - `SSHSession`: Handles the SSH session and state management
 - `SSHServer`: Handles authentication and session creation
