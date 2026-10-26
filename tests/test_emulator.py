@@ -12,7 +12,7 @@ project_root = Path(__file__).parent.parent
 if str(project_root) not in sys.path:
     sys.path.insert(0, str(project_root))
 
-from core.ssh_server import create_ssh_server
+from core.ssh_server import DeviceManager, SSHSession, create_ssh_server
 
 # Configure test logging
 logging.basicConfig(level=logging.INFO)
@@ -101,3 +101,29 @@ async def test_device_emulation(ssh_server):
         result = await conn.run("invalid-command")
         assert result.returncode != 0
         assert "not found" in result.stderr
+
+
+class _RecordingChannel:
+    """Minimal channel stub that records everything written to it."""
+
+    def __init__(self):
+        self.written = []
+
+    def write(self, data):
+        self.written.append(data)
+
+
+def test_port_listing_marks_busy_ports():
+    """Ports held by another session are flagged in the pmshell listing."""
+    manager = DeviceManager()
+    manager.add_device(1, "opengear", "ACM7000", "og-1")
+    manager.add_device(2, "cisco", "C9300", "sw-1")
+    session = SSHSession(manager)
+    session.channel = _RecordingChannel()
+    assert manager.try_acquire_port(2, owner_id=-1)
+
+    session._show_available_ports()
+
+    listing = "".join(session.channel.written)
+    assert "2: sw-1 (in use)" in listing
+    assert "1: og-1 (in use)" not in listing

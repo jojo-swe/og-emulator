@@ -52,6 +52,11 @@ class DeviceManager:
                 return True
             return False
 
+    def is_port_busy(self, port: int) -> bool:
+        """Return True if a session currently holds the port."""
+        with self._port_lock:
+            return port in self._port_owners
+
     def release_port(self, port: int, owner_id: int) -> None:
         """Release port ownership if held by the given session."""
         with self._port_lock:
@@ -391,6 +396,8 @@ class SSHSession(asyncssh.SSHServerSession):
             # Use hostname if available, otherwise device name
             name = dev.get('hostname') or dev.get('name') or 'N/A'
             entry = f"{dev['port']}: {name}"
+            if self.device_manager.is_port_busy(dev['port']):
+                entry += " (in use)"
             self.channel.write(f"{entry:<{col_width}}")
             col_count += 1
             if col_count == cols:

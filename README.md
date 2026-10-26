@@ -161,7 +161,7 @@ ssh admin@localhost -p 2222 pmshell
 
 ### pmshell Mode
 
-- `<port>` - Connect to a specific port by number (valid ports are 1–12)
+- `<port>` - Connect to a specific port by number (valid ports are 1–12). Each port takes one session at a time; ports held by a session are marked `(in use)` in the listing
 - `exit`, `quit`, `.` - Exit pmshell
 
 ### pmshell Special Commands
