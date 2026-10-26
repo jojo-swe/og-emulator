@@ -57,6 +57,21 @@ python -m emulator --config config.json
 
 If the path is omitted, the emulator falls back to the bundled `config/default_config.json`.
 
+### Check a Configuration
+
+`--check-config` prints the resolved settings and device table, then exits without starting the server. It exits 1 if any device entry is invalid (for example an unknown `device_type`).
+
+```
+$ python -m emulator --check-config
+Host: 0.0.0.0  Port: 2222  Username: admin
+PORT  TYPE        MODEL           HOSTNAME
+1     opengear    ACM7000         opengear-1
+2     cisco       C9300           cisco-switch-1
+3     garderos    GCX-3100        garderos-1
+4     cisco       C2960           cisco-switch-2
+5     opengear    IM7200          opengear-2
+```
+
 ### Enable Debug Logging
 
 ```bash

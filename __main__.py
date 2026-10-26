@@ -10,7 +10,7 @@ from pathlib import Path
 from typing import Any, Dict
 
 # Import the fixed server module
-from core.ssh_server import create_ssh_server
+from core.ssh_server import DeviceManager, create_ssh_server
 
 
 DEFAULT_CONFIG_PATH = Path(__file__).resolve().parent / "config" / "default_config.json"
@@ -90,6 +90,26 @@ def configure_logging(log_config: Dict[str, Any], debug: bool) -> logging.Logger
     return root_logger
 
 
+def check_config(config: Dict[str, Any]) -> int:
+    """Print the resolved configuration; return 1 if any device entry is invalid."""
+    print(f"Host: {config['host']}  Port: {config['port']}  Username: {config['username']}")
+    print(f"{'PORT':<6}{'TYPE':<12}{'MODEL':<16}HOSTNAME")
+    manager = DeviceManager()
+    status = 0
+    for entry in config['devices']:
+        port = entry.get('port')
+        try:
+            manager.add_device(**entry)
+        except TypeError as exc:  # missing required keys
+            print(f"Invalid device entry for port {port}: {exc}", file=sys.stderr)
+        mark = ""
+        if port not in manager.devices:
+            mark, status = "  (INVALID)", 1
+        print(f"{port!s:<6}{entry.get('device_type', '')!s:<12}"
+              f"{entry.get('model', '')!s:<16}{entry.get('hostname', '')}{mark}")
+    return status
+
+
 def main():
     """Main entry point."""
     parser = argparse.ArgumentParser(description='SSH Device Emulator')
@@ -99,7 +119,9 @@ def main():
     parser.add_argument('--password', default='admin', help='SSH password')
     parser.add_argument('--config', type=str, help='JSON config file')
     parser.add_argument('--debug', action='store_true', help='Enable debug logging')
-    
+    parser.add_argument('--check-config', action='store_true',
+                        help='Validate and print the resolved configuration, then exit')
+
     args = parser.parse_args()
     
     # Build configuration from defaults and optional files
@@ -146,6 +168,9 @@ def main():
 
     config.setdefault('host_key', DEFAULT_CONFIG['host_key'])
     config.setdefault('devices', DEFAULT_CONFIG['devices'])
+
+    if args.check_config:
+        sys.exit(check_config(config))
 
     logger = configure_logging(config.get('logging', {}), args.debug)
 

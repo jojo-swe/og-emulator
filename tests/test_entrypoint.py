@@ -31,3 +31,22 @@ def test_runner_script_help():
     result = _help([sys.executable, str(script), "--help"])
     assert result.returncode == 0, result.stderr
     assert "SSH Device Emulator" in result.stdout
+
+
+def test_check_config():
+    """``--check-config`` prints the default devices and exits 0."""
+    result = _help([sys.executable, "-m", "emulator", "--check-config"])
+    assert result.returncode == 0, result.stderr
+    for hostname in ("opengear-1", "cisco-switch-1", "garderos-1"):
+        assert hostname in result.stdout
+
+
+def test_check_config_rejects_unknown_device_type(tmp_path):
+    """An unknown ``device_type`` makes ``--check-config`` exit 1."""
+    config = tmp_path / "bad.json"
+    config.write_text(
+        '{"devices": [{"port": 1, "device_type": "nope", "model": "X", "hostname": "bad-1"}]}'
+    )
+    result = _help([sys.executable, "-m", "emulator", "--check-config", "--config", str(config)])
+    assert result.returncode == 1
+    assert "bad-1  (INVALID)" in result.stdout
