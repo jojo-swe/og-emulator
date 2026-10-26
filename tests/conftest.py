@@ -1,37 +1,12 @@
 """Pytest configuration and fixtures for emulator tests."""
 
-import asyncio
 import os
 import sys
-from typing import Generator
 
 import pytest
 
 # Add the project root to the Python path
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-
-# Set up asyncio policy for Windows (deprecated in Python 3.16+)
-if sys.platform == 'win32' and sys.version_info < (3, 16):
-    try:
-        asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
-    except AttributeError:
-        pass  # Policy not available in future Python versions
-
-
-@pytest.fixture(scope="session")
-def event_loop() -> Generator[asyncio.AbstractEventLoop, None, None]:
-    """Create an instance of the default event loop for the test session."""
-    if sys.platform == 'win32':
-        # On Windows, ProactorEventLoop is required for subprocess support
-        loop = asyncio.ProactorEventLoop()
-    else:
-        loop = asyncio.new_event_loop()
-    
-    yield loop
-    
-    # Clean up
-    if not loop.is_closed():
-        loop.close()
 
 
 @pytest.fixture
