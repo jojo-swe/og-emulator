@@ -1,9 +1,7 @@
 #!/usr/bin/env python3
 """Test script for configuration system."""
 
-import os
 import sys
-import json
 import pytest
 from pathlib import Path
 

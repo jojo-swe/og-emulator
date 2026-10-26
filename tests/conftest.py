@@ -2,12 +2,10 @@
 
 import asyncio
 import os
-import signal
 import sys
-from typing import AsyncGenerator, Generator
+from typing import Generator
 
 import pytest
-import pytest_asyncio
 
 # Add the project root to the Python path
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))

@@ -1,8 +1,7 @@
 """Device factory for creating emulated devices."""
 
-import importlib
 import logging
-from typing import Dict, Type, Optional, Any, Callable
+from typing import Dict, Type, Callable
 
 from .base import BaseDevice
 

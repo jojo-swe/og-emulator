@@ -2,13 +2,12 @@
 
 import logging
 import multiprocessing
-import os
 import signal
 import sys
 import threading
 import time
 from pathlib import Path
-from typing import Any, Dict, Optional, Type, TypeVar, List, Union
+from typing import Any, Dict, Optional, Type, TypeVar, Union
 
 from .config import EmulatorConfig
 

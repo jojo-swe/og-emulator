@@ -6,7 +6,6 @@ import os
 import sys
 import tempfile
 from pathlib import Path
-from typing import AsyncGenerator
 
 import asyncssh
 import pytest

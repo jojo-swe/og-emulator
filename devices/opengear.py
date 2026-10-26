@@ -1,7 +1,6 @@
 """Opengear device emulation."""
 
 import time
-from typing import Dict, Any, List, Optional
 
 from .base import BaseDevice
 from .factory import register_device

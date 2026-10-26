@@ -4,7 +4,6 @@
 import asyncio
 import asyncssh
 import json
-from pathlib import Path
 
 
 async def test_basic_connection():
@@ -130,7 +129,7 @@ async def test_multiple_sessions():
                 password='admin',
                 known_hosts=None
             ) as conn:
-                result = await conn.run('help', check=True)
+                await conn.run('help', check=True)
                 return f"Session {session_id}: Success"
         except Exception as e:
             return f"Session {session_id}: Failed - {e}"

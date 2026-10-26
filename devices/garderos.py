@@ -1,7 +1,6 @@
 """Garderos device emulation."""
 
 import time
-from typing import Dict, Any, List, Optional
 
 from .base import BaseDevice
 from .factory import register_device
@@ -289,17 +288,7 @@ Ethernet0/1 is administratively down, line protocol is down
         elif self._current_mode == "configure":
             return f"{interfaces}\r\n{self._configured_hostname}(config)# "
         return interfaces
-        
-        uptime = []
-        if days > 0:
-            uptime.append(f"{days} day{'s' if days != 1 else ''}")
-        if hours > 0 or days > 0:
-            uptime.append(f"{hours} hour{'s' if hours != 1 else ''}")
-        if minutes > 0 or hours > 0 or days > 0:
-            uptime.append(f"{minutes} minute{'s' if minutes != 1 else ''}")
-            
-        return ", ".join(uptime)
-    
+
     def _cmd_show_version(self, command_line: str) -> str:
         """Handle the 'show version' command.
         

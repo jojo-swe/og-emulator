@@ -4,7 +4,6 @@
 import asyncio
 import logging
 import os
-import sys
 import threading
 from typing import Dict, Optional, Any, List
 
@@ -608,7 +607,7 @@ class SSHServer(asyncssh.SSHServer):
         if username and username.endswith(':serial'):
             base_username = username[:-7]  # Remove :serial suffix
             direct_pmshell = True
-            self.logger.info(f"Detected :serial suffix in username, will connect directly to pmshell")
+            self.logger.info("Detected :serial suffix in username, will connect directly to pmshell")
         
         valid = (base_username == self.username and password == self.password)
         if valid:

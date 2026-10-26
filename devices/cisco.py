@@ -1,7 +1,5 @@
 """Cisco device emulation."""
 
-import re
-from typing import Dict, Any, List, Optional
 
 from .base import BaseDevice
 from .factory import register_device
@@ -85,7 +83,7 @@ class CiscoDevice(BaseDevice):
                 return f"{self.hostname}# "
             return f"{self.hostname}> "
         
-        return f"% Invalid input detected at '^' marker\r\n"
+        return "% Invalid input detected at '^' marker\r\n"
     
     def _show_version(self) -> str:
         """Generate show version output.
