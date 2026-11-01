@@ -97,3 +97,11 @@ ssh_host_key
 logs/
 old_files/
 *.log
+
+# privacy-guard: local secrets, logs, and editor state
+.env.*
+!.env.example
+*.local
+*.local.*
+.vscode/settings.json
+secrets/
