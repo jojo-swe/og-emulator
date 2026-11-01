@@ -231,9 +231,9 @@ System Information:
 Network Configuration:
   Interface eth0:
     State:        UP
-    IP Address:   192.168.1.1
+    IP Address:   192.168.x.y
     Netmask:      255.255.255.0
-    Gateway:      192.168.1.254
+    Gateway:      192.168.x.y
     MAC Address:  00:11:22:33:44:55
     
   DNS Configuration:

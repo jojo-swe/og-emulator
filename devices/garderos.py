@@ -342,9 +342,9 @@ System Information:
 Network Interfaces:
   eth0:
     Status:       UP
-    IP Address:   192.168.10.1
+    IP Address:   192.168.x.y
     Netmask:      255.255.255.0
-    Gateway:      192.168.10.254
+    Gateway:      192.168.x.y
     MAC Address:  AA:BB:CC:DD:EE:FF
     
   eth1:
@@ -459,8 +459,8 @@ Current Configuration:
   user root password <encrypted>
   user admin password <encrypted>
   user operator password <encrypted>
-  interface eth0 address 192.168.10.1/24
-  interface eth0 gateway 192.168.10.254
+  interface eth0 address 192.168.x.y/24
+  interface eth0 gateway 192.168.x.y
   dns primary 8.8.8.8
   dns secondary 1.1.1.1
 \r\n"""
