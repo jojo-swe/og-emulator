@@ -1,3 +1,5 @@
+<p align="center"><img src=".github/assets/logo.svg" alt="og-emulator logo" width="128"></p>
+
 # OpenGear SSH Device Emulator
 
 An SSH emulator that simulates OpenGear console servers with connected Cisco and Garderos devices for testing and development.
